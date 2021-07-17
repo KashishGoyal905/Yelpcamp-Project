@@ -15,7 +15,7 @@ mongoose.connect('mongodb://localhost:27017/yelp-camp', {
     useCreateIndex: true,
     useUnifiedTopology: true
 });
- 
+
 //don't know why this is here kinda like connecting with mongo
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, "connection error:"));
@@ -35,15 +35,26 @@ app.get('/', (req, res) => {
     res.render('home');
 });
 
-//it will take to the campground page /makecampground
-app.get('/makecampground', async (req, res) => {
-    // have to make it async and await coz it's take time so we make it async so it will stop until then
-    const camp = new Campground({ title: 'My Backyard',description: 'free camping'});
-    await camp.save();
-    res.send(camp);
+//making page for campgrounds
+app.get('/campgrounds', async (req, res) => {
+    //finding all campgrounds
+    const campgrounds = await Campground.find({});
+    //rendering index under campgrounds under views && passing all found campgound;
+    res.render('campgrounds/index', { campgrounds });
 });
+
+
+
+//it will take to the campground page /makecampground
+// app.get('/makecampground', async (req, res) => {
+//     // have to make it async and await coz it's take time so we make it async so it will stop until then
+//     const camp = new Campground({ title: 'My Backyard',description: 'free camping'});
+//     await camp.save();
+//     res.send(camp);
+// });
+//don't need this now
 
 //setting port for all the pages
 app.listen(3000, () => {
-    console.log('serving on port 3000')
+    console.log('serving on port 3000');
 });

@@ -18,7 +18,7 @@ mongoose.connect('mongodb://localhost:27017/yelp-camp', {
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, "connection error:"));
 db.once("open", () => {
-    console.log("Database connected");
+    console.log("Seed Database connected");
 });
 
 // a sample function to search for place and their native place randomly in seedhelpers file
@@ -42,7 +42,8 @@ const seedDb = async () => {
 
 }
 // running function
-seedDb().then((req,res) => {
+seedDb().then((req, res) => {
     //disconnecting from seedDb after a sec connection;
+    console.log("disconnected seed database as said");
     mongoose.connection.close();
 })
