@@ -3,7 +3,8 @@ const express = require('express');
 const app = express();
 //requiring path for views directory to acess it from anywhere
 const path = require('path');
-
+//requiring method-override for pull and patch request download via(npm i method-override)
+const methodOverride = require('method-override');
 //requiring mongoose
 const mongoose = require('mongoose');
 //requiring campground.js file here
@@ -30,6 +31,8 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 //parsing body to see output
 app.use(express.urlencoded({extended: true}));
+//using method-override
+app.use(methodOverride('_method'));
 
 //first home page
 app.get('/', (req, res) => {
@@ -62,7 +65,7 @@ app.post('/campgrounds',async (req, res)=>{
     await campground.save();
     //redirecting after save 
     res.redirect(`/campgrounds/${campground._id}`);
-})
+});
 
 //whenever someone try to come to this url it will show show.ejs file under campgrounds
 app.get('/campgrounds/:id', async (req, res) => {
@@ -72,6 +75,27 @@ app.get('/campgrounds/:id', async (req, res) => {
     res.render('campgrounds/show', {campground});
 });
 
+//edit page for campgrounds 
+app.get('/campgrounds/:id/edit', async (req, res) => {
+    //now we will find campground which user asked in url 
+    const campground = await Campground.findById(req.params.id);
+    //rendering to edit page to edit a campground
+    res.render('campgrounds/edit', {campground});
+
+});
+
+//put request for updating specific campground
+app.put('/campgrounds/:id', async (req, res) =>{
+    //to check it worked
+    // res.send("it worked");
+
+    // finding id via url
+    const {id} = req.params;
+    // finding by id and updating && spreading in object 
+    const campground = await Campground.findByIdAndUpdate(id, {...req.body.campground});
+    // redirecting to specific campground details page
+    res.redirect(`/campgrounds/${campground._id}`);
+});
 
 //it will take to the campground page /makecampground
 // app.get('/makecampground', async (req, res) => {
