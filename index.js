@@ -43,6 +43,14 @@ app.get('/campgrounds', async (req, res) => {
     res.render('campgrounds/index', { campgrounds });
 });
 
+//whenever someone try to come to this url it will show show.ejs file under campgrounds
+app.get('/campgrounds/:id', async (req, res) => {
+    //now we will find campground which user asked in url 
+    const campground = await Campground.findById(req.params.id);
+    //rendering show file  under campgrounds under views && we will pass that one found campground in show file
+    res.render('campgrounds/show', {campground});
+});
+
 
 
 //it will take to the campground page /makecampground
