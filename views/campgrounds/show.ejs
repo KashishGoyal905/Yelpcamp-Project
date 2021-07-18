@@ -1,4 +1,4 @@
-<!-- file to show specific campground details  --> 
+<!-- file to show specific campground details  -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -18,10 +18,13 @@
     <h2>
         <%= campground.location %>
     </h2>
+    <!-- for edit it will take to edt.ejs file for specific campground edit -->
+    <p>
+        <a href="/campgrounds/<%=campground._id %>/edit">Edit</a>
+    </p>
 
-
-    <footer> 
-           <!--back to all campgrounds  -->
+    <footer>
+        <!--back to all campgrounds  -->
         <a href="/campgrounds">All Campgrounds</a>
     </footer>
 
