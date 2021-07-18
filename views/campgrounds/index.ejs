@@ -1,4 +1,4 @@
- <!-- file to show all campgrounds from main index.js -->
+<!-- file to show all campgrounds from main index.js -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,11 +11,19 @@
 
 <body>
     <h1>All Campgrounds</h1>
+    <div>
+        <!-- link to new campground page -->
+        <a href="/campgrounds/new">Make A New</a>
+    </div>
+
     <ul>
         <!-- made all camgrounds a link when we click it will take us to a page(/campgrounds/:id) -->
-        <% for(let campground of campgrounds){ %> 
-            <li><a href="/campgrounds/<%=campground._id %>"><%= campground.title%></a></li>
-            <%}%> 
+        <% for(let campground of campgrounds){ %>
+            <li><a href="/campgrounds/<%=campground._id %>">
+                    <%= campground.title%>
+                </a></li>
+            <%}%>
+
 
     </ul>
 </body>

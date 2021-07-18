@@ -28,6 +28,8 @@ db.once("open", () => {
 app.set('view engine', 'ejs');
 // by this it will search(home.ejs) via whole path not relative
 app.set('views', path.join(__dirname, 'views'));
+//parsing body to see output
+app.use(express.urlencoded({extended: true}));
 
 //first home page
 app.get('/', (req, res) => {
@@ -43,6 +45,25 @@ app.get('/campgrounds', async (req, res) => {
     res.render('campgrounds/index', { campgrounds });
 });
 
+//new page for cretaing new campgrounds
+app.get('/campgrounds/new', (req, res) => {
+    //rendering to new.ejs file
+    res.render('campgrounds/new');
+});
+
+//posting new added campground via post req
+app.post('/campgrounds',async (req, res)=>{
+    //by default it will show us the empty body so we have to parse it
+    // res.send(req.body);
+
+    //making new campground by user input
+    const campground = new Campground(req.body.campground);
+    //saving new campground to database
+    await campground.save();
+    //redirecting after save 
+    res.redirect(`/campgrounds/${campground._id}`);
+})
+
 //whenever someone try to come to this url it will show show.ejs file under campgrounds
 app.get('/campgrounds/:id', async (req, res) => {
     //now we will find campground which user asked in url 
@@ -50,7 +71,6 @@ app.get('/campgrounds/:id', async (req, res) => {
     //rendering show file  under campgrounds under views && we will pass that one found campground in show file
     res.render('campgrounds/show', {campground});
 });
-
 
 
 //it will take to the campground page /makecampground
@@ -61,6 +81,7 @@ app.get('/campgrounds/:id', async (req, res) => {
 //     res.send(camp);
 // });
 //don't need this now
+
 
 //setting port for all the pages
 app.listen(3000, () => {
