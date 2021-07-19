@@ -97,6 +97,13 @@ app.put('/campgrounds/:id', async (req, res) =>{
     res.redirect(`/campgrounds/${campground._id}`);
 });
 
+//deleting specific campground
+app.delete('/campgrounds/:id', async (req, res) =>{
+    const {id} = req.params;
+    await Campground.findByIdAndDelete(id);
+    res.redirect('/campgrounds');
+});
+
 //it will take to the campground page /makecampground
 // app.get('/makecampground', async (req, res) => {
 //     // have to make it async and await coz it's take time so we make it async so it will stop until then
