@@ -1,15 +1,9 @@
 <!-- page for editing campgrounds coonected to /campgrounds/edit -->
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Campground</title>
-</head>
+<!-- injecting code to boiler plate -->
+<!-- it will pass everything here to the body of boiler plate -->
+<% layout('layouts/boilerPlate') %>
 
-<body>
     <h1>Edit campground</h1>
     <!-- as soon as i hit update it will update things in action url-->
     <form action="/Campgrounds/<%=campground._id  %>?_method=PUT" method="POST">
@@ -30,6 +24,3 @@
         <!--back to specific campgrounds  -->
         <a href="/campgrounds/<%=campground._id%>">All Campgrounds</a>
     </footer>
-</body>
-
-</html>

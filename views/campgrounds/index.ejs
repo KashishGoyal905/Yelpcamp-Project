@@ -1,31 +1,21 @@
 <!-- file to show all campgrounds from main index.js -->
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campgrounds</title>
-</head>
+<!-- injecting code to boiler plate -->
+<!-- it will pass everything here to the body of boiler plate -->
+<% layout('layouts/boilerPlate') %> 
+<h1>All Campgrounds</h1>
+<div>
+    <!-- link to new campground page -->
+    <a href="/campgrounds/new">Make A New</a>
+</div>
 
-<body>
-    <h1>All Campgrounds</h1>
-    <div>
-        <!-- link to new campground page -->
-        <a href="/campgrounds/new">Make A New</a>
-    </div>
+<ul>
+    <!-- made all camgrounds a link when we click it will take us to a page(/campgrounds/:id) -->
+    <% for(let campground of campgrounds){ %>
+        <li><a href="/campgrounds/<%=campground._id %>">
+                <%= campground.title%>
+            </a></li>
+        <%}%>
+</ul>
 
-    <ul>
-        <!-- made all camgrounds a link when we click it will take us to a page(/campgrounds/:id) -->
-        <% for(let campground of campgrounds){ %>
-            <li><a href="/campgrounds/<%=campground._id %>">
-                    <%= campground.title%>
-                </a></li>
-            <%}%>
-
-
-    </ul>
-</body>
-
-</html>
+<!-- injecting code to boiler plate -->
