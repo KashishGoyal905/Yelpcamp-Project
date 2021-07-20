@@ -12,6 +12,17 @@
     <h2>
         <%= campground.location %>
     </h2>
+    <!-- it will show image of that unsplash image campground -->
+    <img src="<%= campground.image %> ">
+    <!-- it will show description of that one found(hardcoded) campground -->
+    <p>
+        <%= campground.description %>
+    </p>
+    <!-- it will show price of that one found(hardcoded) campground -->
+    <h2>
+        <%= campground.price %>
+    </h2>
+
     <!-- for edit it will take to edt.ejs file for specific campground edit -->
     <p>
         <a href="/campgrounds/<%=campground._id %>/edit">Edit</a>
