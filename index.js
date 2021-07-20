@@ -9,6 +9,8 @@ const methodOverride = require('method-override');
 const mongoose = require('mongoose');
 //requiring campground.js file here
 const Campground = require('./models/campground');
+//requiring ejs-mate for templates
+const ejsMate = require('ejs-mate');
 
 //connecting mongo man
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
@@ -33,6 +35,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({extended: true}));
 //using method-override
 app.use(methodOverride('_method'));
+//setting enfine for ejs-mate
+app.engine('ejs',ejsMate);
 
 //first home page
 app.get('/', (req, res) => {
