@@ -71,6 +71,7 @@ app.post('/campgrounds',async (req, res)=>{
     res.redirect(`/campgrounds/${campground._id}`);
 });
 
+
 //whenever someone try to come to this url it will show show.ejs file under campgrounds
 app.get('/campgrounds/:id', async (req, res) => {
     //now we will find campground which user asked in url 
