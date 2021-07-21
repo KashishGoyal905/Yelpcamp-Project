@@ -2,20 +2,45 @@
 
 <!-- injecting code to boiler plate -->
 <!-- it will pass everything here to the body of boiler plate -->
-<% layout('layouts/boilerPlate') %> 
-<h1>All Campgrounds</h1>
-<div>
-    <!-- link to new campground page -->
-    <a href="/campgrounds/new">Make A New</a>
-</div>
+<% layout('layouts/boilerPlate') %>
+    <h1>All Campgrounds</h1>
+    <div>
+        <!-- link to new campground page -->
+        <a href="/campgrounds/new">Make A New</a>
+    </div>
 
-<ul>
-    <!-- made all camgrounds a link when we click it will take us to a page(/campgrounds/:id) -->
+    <!-- made all camgrounds a card when we click  the button it will take us to a page(/campgrounds/:id) -->
     <% for(let campground of campgrounds){ %>
-        <li><a href="/campgrounds/<%=campground._id %>">
-                <%= campground.title%>
-            </a></li>
+        <!-- making a card for evry found campground -->
+        <div class="card mb-3">
+            <div class="row">
+                <div class="col-md-4">
+                    <!-- added image -->
+                    <img class="img-fluid" src="<%= campground.image %>">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <!--campground title -->
+                        <h5 class="card-title">
+                            <%=campground.title%>
+                        </h5>
+                        <!--campground description -->
+                        <p class="card-text">
+                            <%=campground.description%>
+                        </p>
+                        <!--campground location -->
+                        <p class="card-text">
+                            <small class="text-muted">
+                                <%= campground.location %>
+                            </small>
+                        </p>
+                        <!-- link to go to specifi campground (via id) -->
+                        <a href="/campgrounds/<%=campground._id %>" class="btn btn-primary">View <%= campground.title %>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
         <%}%>
-</ul>
 
-<!-- injecting code to boiler plate -->
+            <!-- injecting code to boiler plate -->
