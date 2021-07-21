@@ -4,35 +4,40 @@
 <!-- it will pass everything here to the body of boiler plate -->
 <% layout('layouts/boilerPlate') %>
 
-    <!-- it will show title of that one found campground -->
-    <h1>
-        <%= campground.title %>
-    </h1>
-    <!-- it will show location of that one found campground -->
-    <h2>
-        <%= campground.location %>
-    </h2>
-    <!-- it will show image of that unsplash image campground -->
-    <img src="<%= campground.image %> ">
-    <!-- it will show description of that one found(hardcoded) campground -->
-    <p>
-        <%= campground.description %>
-    </p>
-    <!-- it will show price of that one found(hardcoded) campground -->
-    <h2>
-        <%= campground.price %>
-    </h2>
-
-    <!-- for edit it will take to edt.ejs file for specific campground edit -->
-    <p>
-        <a href="/campgrounds/<%=campground._id %>/edit">Edit</a>
-    </p>
-    <!-- deleting -->
-    <form action="/campgrounds/<%=campground._id %>?_method=DELETE" method="POST">
-        <button>Delete</button>
-    </form>
-
-    <footer>
-        <!--back to all campgrounds  -->
-        <a href="/campgrounds">All Campgrounds</a>
-    </footer>
+    <div class="row">
+        <div class="col-6 offset-3">
+            <div class="card mb-3">
+                <!-- it will show image of that unsplash image campground -->
+                <img src="<%= campground.image%>" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <!-- it will show title of that one found campground -->
+                    <h5 class="card-title">
+                        <%= campground.title%>
+                    </h5>
+                    <!-- it will show description of that one found(hardcoded) campground -->
+                    <p class="card-text">
+                        <%= campground.description%>
+                    </p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <!-- it will show location of that one found campground -->
+                    <li class="list-group-item text-muted">
+                        <%= campground.location%>
+                    </li>
+                    <!-- it will show price of that one found(hardcoded) campground -->
+                    <li class="list-group-item">$<%= campground.price%>/night</li>
+                </ul>
+                <div class="card-body">
+                    <!-- for edit it will take to edt.ejs file for specific campground edit -->
+                    <a class="card-link btn btn-info" href="/campgrounds/<%=campground._id%>/edit">Edit</a>
+                    <!-- deleting -->
+                    <form class="d-inline" action="/campgrounds/<%=campground._id%>?_method=DELETE" method="POST">
+                        <button class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+                <div class="card-footer text-muted">
+                    2 days ago
+                </div>
+            </div>
+        </div>
+    </div>
