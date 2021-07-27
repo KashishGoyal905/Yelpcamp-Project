@@ -22,14 +22,29 @@ app.use('/dogs',(req, res, next) => {
     next();
 })
 
+
 //simple auth trick 
-app.use('/secrets',(req, res, next) => {
-    const {pass} = req.query;
-    if(pass === "chickens"){
+// app.use('/secrets',(req, res, next) => {
+//     const {pass} = req.query;
+//     if(pass === "chickens"){
+//         next();
+//     }
+//     res.send("you need a pass");
+// })
+const verifyPassword = (req, res, next) => {
+    const { password } = req.query;
+    if (password === 'chicken') {
         next();
     }
-    res.send("you need a pass");
+    // res.send("YOU NEED A PASSWORD!");
+    g\
+    //throwing custom errors
+}
+app.get('/secret', verifyPassword, (req, res) => {
+    res.send('MY SECRET IS: Sometimes I wear headphones in public so I dont have to talk to anyone')
 })
+
+
 
 // how next works if we did not call it will stop after doing app.use no further code read
 // app.use((req, res, next) => {
