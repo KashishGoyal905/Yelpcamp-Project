@@ -36,8 +36,7 @@ const verifyPassword = (req, res, next) => {
     if (password === 'chicken') {
         next();
     }
-    // res.send("YOU NEED A PASSWORD!");
-    g\
+    // res.send("YOU NEED A PASSWORD!")
     //throwing custom errors
 }
 app.get('/secret', verifyPassword, (req, res) => {

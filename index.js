@@ -109,14 +109,15 @@ app.delete('/campgrounds/:id', async (req, res) =>{
     res.redirect('/campgrounds');
 });
 
-//it will take to the campground page /makecampground
+// just to make sure our database is connected👇
+// it will take to the campground page /makecampground
 // app.get('/makecampground', async (req, res) => {
 //     // have to make it async and await coz it's take time so we make it async so it will stop until then
 //     const camp = new Campground({ title: 'My Backyard',description: 'free camping'});
 //     await camp.save();
 //     res.send(camp);
 // });
-//don't need this now
+// don't need this now☝️
 
 
 //setting port for all the pages
