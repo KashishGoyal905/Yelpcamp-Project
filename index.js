@@ -11,6 +11,8 @@ const mongoose = require('mongoose');
 const Campground = require('./models/campground');
 //requiring ejs-mate for templates
 const ejsMate = require('ejs-mate');
+//requiring class/function apperror to throw our custom error
+const AppError = require('./AppError');
 
 //connecting mongo man
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
@@ -32,11 +34,11 @@ app.set('view engine', 'ejs');
 // by this it will search(home.ejs) via whole path not relative
 app.set('views', path.join(__dirname, 'views'));
 //parsing body to see output
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 //using method-override
 app.use(methodOverride('_method'));
 //setting enfine for ejs-mate
-app.engine('ejs',ejsMate);
+app.engine('ejs', ejsMate);
 
 //first home page
 app.get('/', (req, res) => {
@@ -59,7 +61,7 @@ app.get('/campgrounds/new', (req, res) => {
 });
 
 //posting new added campground via post req
-app.post('/campgrounds',async (req, res)=>{
+app.post('/campgrounds', async (req, res) => {
     //by default it will show us the empty body so we have to parse it
     // res.send(req.body);
 
@@ -73,11 +75,15 @@ app.post('/campgrounds',async (req, res)=>{
 
 
 //whenever someone try to come to this url it will show show.ejs file under campgrounds
-app.get('/campgrounds/:id', async (req, res) => {
+app.get('/campgrounds/:id', async (req, res, next) => {
     //now we will find campground which user asked in url 
     const campground = await Campground.findById(req.params.id);
+    if (!campground) {
+        //a function/class apperror we pass in next();
+        return next(new AppError('Campground not found', 404));
+    }
     //rendering show file  under campgrounds under views && we will pass that one found campground in show file
-    res.render('campgrounds/show', {campground});
+    res.render('campgrounds/show', { campground });
 });
 
 //edit page for campgrounds 
@@ -85,26 +91,26 @@ app.get('/campgrounds/:id/edit', async (req, res) => {
     //now we will find campground which user asked in url 
     const campground = await Campground.findById(req.params.id);
     //rendering to edit page to edit a campground
-    res.render('campgrounds/edit', {campground});
+    res.render('campgrounds/edit', { campground });
 
 });
 
 //put request for updating specific campground
-app.put('/campgrounds/:id', async (req, res) =>{
+app.put('/campgrounds/:id', async (req, res) => {
     //to check it worked
     // res.send("it worked");
 
     // finding id via url
-    const {id} = req.params;
+    const { id } = req.params;
     // finding by id and updating && spreading in object 
-    const campground = await Campground.findByIdAndUpdate(id, {...req.body.campground});
+    const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
     // redirecting to specific campground details page
     res.redirect(`/campgrounds/${campground._id}`);
 });
 
 //deleting specific campground as simple as that
-app.delete('/campgrounds/:id', async (req, res) =>{
-    const {id} = req.params;
+app.delete('/campgrounds/:id', async (req, res) => {
+    const { id } = req.params;
     await Campground.findByIdAndDelete(id);
     res.redirect('/campgrounds');
 });
@@ -119,6 +125,12 @@ app.delete('/campgrounds/:id', async (req, res) =>{
 // });
 // don't need this now☝️
 
+//a route for error handling whenever next(some parameter) is called it will come to this route;
+app.use((err, req, res, next) => {
+            //default status         //default message
+    const { status = 500, message = 'Something went wrong' } = err;
+    res.status(status).send(message);
+});
 
 //setting port for all the pages
 app.listen(3000, () => {
