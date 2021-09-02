@@ -7,38 +7,53 @@
     <div class="row">
         <h1 class="text-center">Edit Campground</h1>
         <div class="col-6 offset-3">
-            <!-- as soon as i hit update it will update things in action url-->
-            <form action="/campgrounds/<%=campground._id%>?_method=PUT" method="POST">
+            <!-- as soon as i hit update it will update things in action url-- required required will not work will do our own validation-->
+            <form action="/campgrounds/<%=campground._id%>?_method=PUT" method="POST" novalidate class="Validation-form">
                 <div class="mb-3">
                     <label class="form-label" for="title">Title</label>
                     <!-- value will take value from previous page previos values -->
-                    <input class="form-control" type="text" id="title" name="campground[title]"
+                    <input class="form-control" type="text" id="title" name="campground[title]" required
                         value="<%=campground.title %>">
+                         <div class="valid-feedback">
+                        Looks Good!
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="location">Location</label>
                     <!-- value will take value from previous page previos values -->
-                    <input class="form-control" type="text" id="location" name="campground[location]"
+                    <input class="form-control" type="text" id="location" name="campground[location]" required
                         value="<%=campground.location %>">
+                         <div class="valid-feedback">
+                        Looks Good!
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="image">Image Url</label>
-                    <input class="form-control" type="text" id="image" name="campground[image]"
+                    <input class="form-control" type="text" id="image" name="campground[image]" required
                         value="<%=campground.image %>">
+                         <div class="valid-feedback">
+                        Looks Good!
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="price">Campground Price</label>
                     <div class="input-group">
                         <span class="input-group-text" id="price-label">$</span>
                         <input type="text" class="form-control" id="price" placeholder="0.00" aria-label="price"
-                            aria-describedby="price-label" name="campground[price]" value="<%=campground.price %>">
+                            aria-describedby="price-label" name="campground[price]" required value="<%=campground.price %>">
+                             <div class="valid-feedback">
+                        Looks Good!
+                    </div>
                     </div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label" for="description">Description</label>
                     <textarea class="form-control" type="text" id="description"
-                        name="campground[description]"><%= campground.description%></textarea>
+                        name="campground[description]" required><%= campground.description%></textarea>
+                         <div class="valid-feedback">
+                        Looks Good!
+                    </div>
                 </div>
                 <div class="mb-3">
                     <button class="btn btn-info">Update Campground</button>
