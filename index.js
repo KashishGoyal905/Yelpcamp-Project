@@ -11,8 +11,12 @@ const mongoose = require('mongoose');
 const Campground = require('./models/campground');
 //requiring ejs-mate for templates
 const ejsMate = require('ejs-mate');
+
+// //requiring class/function apperror to throw our custom error (DEMO)
+// const AppError = require('./AppError');
+
 //requiring class/function apperror to throw our custom error
-const AppError = require('./AppError');
+const ExpressError = require('./Utils/ExpressError');
 
 //connecting mongo man
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
@@ -47,12 +51,12 @@ app.get('/', (req, res) => {
 });
 
 //making page for campgrounds
-app.get('/campgrounds', async (req, res) => {
+app.get('/campgrounds', CatchAsync(async (req, res) => {
     //finding all campgrounds
     const campgrounds = await Campground.find({});
     //rendering index under campgrounds under views && passing all found campgound;
     res.render('campgrounds/index', { campgrounds });
-});
+}));
 
 //new page for cretaing new campgrounds
 app.get('/campgrounds/new', (req, res) => {
@@ -61,7 +65,7 @@ app.get('/campgrounds/new', (req, res) => {
 });
 
 //posting new added campground via post req
-app.post('/campgrounds', async (req, res) => {
+app.post('/campgrounds', CatchAsync(async (req, res, next) => {
     //by default it will show us the empty body so we have to parse it
     // res.send(req.body);
 
@@ -71,11 +75,11 @@ app.post('/campgrounds', async (req, res) => {
     await campground.save();
     //redirecting after save 
     res.redirect(`/campgrounds/${campground._id}`);
-});
+}));
 
 
 //whenever someone try to come to this url it will show show.ejs file under campgrounds
-app.get('/campgrounds/:id', async (req, res, next) => {
+app.get('/campgrounds/:id', CatchAsync(async (req, res, next) => {
     //now we will find campground which user asked in url 
     const campground = await Campground.findById(req.params.id);
     if (!campground) {
@@ -84,19 +88,19 @@ app.get('/campgrounds/:id', async (req, res, next) => {
     }
     //rendering show file  under campgrounds under views && we will pass that one found campground in show file
     res.render('campgrounds/show', { campground });
-});
+}));
 
 //edit page for campgrounds 
-app.get('/campgrounds/:id/edit', async (req, res) => {
+app.get('/campgrounds/:id/edit', CatchAsync(async (req, res) => {
     //now we will find campground which user asked in url 
     const campground = await Campground.findById(req.params.id);
     //rendering to edit page to edit a campground
     res.render('campgrounds/edit', { campground });
 
-});
+}));
 
 //put request for updating specific campground
-app.put('/campgrounds/:id', async (req, res) => {
+app.put('/campgrounds/:id', CatchAsync(async (req, res) => {
     //to check it worked
     // res.send("it worked");
 
@@ -106,14 +110,14 @@ app.put('/campgrounds/:id', async (req, res) => {
     const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
     // redirecting to specific campground details page
     res.redirect(`/campgrounds/${campground._id}`);
-});
+}));
 
 //deleting specific campground as simple as that
-app.delete('/campgrounds/:id', async (req, res) => {
+app.delete('/campgrounds/:id', CatchAsync(async (req, res) => {
     const { id } = req.params;
     await Campground.findByIdAndDelete(id);
     res.redirect('/campgrounds');
-});
+}));
 
 // just to make sure our database is connected👇
 // it will take to the campground page /makecampground

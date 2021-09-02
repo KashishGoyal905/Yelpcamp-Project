@@ -1,11 +1,11 @@
 // file for making custom error
 
-class AppError extends Error {
-    constructor(message, status) {
+class ExpressError extends Error {
+    constructor(message, statusCode) {
         super();
         this.message = message;
-        this.status = status;
+        this.statusCode = statusCode;
     }
 }
 //exportion app error class so that we can acess it in other files
-module.exports = AppError;
+module.exports = ExpressError;
