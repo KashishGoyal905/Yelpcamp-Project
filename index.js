@@ -11,12 +11,10 @@ const mongoose = require('mongoose');
 const Campground = require('./models/campground');
 //requiring ejs-mate for templates
 const ejsMate = require('ejs-mate');
-
-// //requiring class/function apperror to throw our custom error (DEMO)
-// const AppError = require('./AppError');
-
-//requiring class/function apperror to throw our custom error
+//requiring class/function Expresserror to throw our custom error 
 const ExpressError = require('./Utils/ExpressError');
+//requiring function catchasync under utils
+const CatchAsync = require('./Utils/CatchAsync');
 
 //connecting mongo man
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
@@ -51,7 +49,7 @@ app.get('/', (req, res) => {
 });
 
 //making page for campgrounds
-app.get('/campgrounds', CatchAsync(async (req, res) => {
+app.get('/campgrounds', CatchAsync(async (req, res, next) => {
     //finding all campgrounds
     const campgrounds = await Campground.find({});
     //rendering index under campgrounds under views && passing all found campgound;
@@ -82,16 +80,17 @@ app.post('/campgrounds', CatchAsync(async (req, res, next) => {
 app.get('/campgrounds/:id', CatchAsync(async (req, res, next) => {
     //now we will find campground which user asked in url 
     const campground = await Campground.findById(req.params.id);
-    if (!campground) {
-        //a function/class apperror we pass in next();
-        return next(new AppError('Campground not found', 404));
-    }
+    //demo for apperror we can do better by app.all()
+    // if (!campground) {
+    //     //a function/class ExpressError we pass in next();
+    //     return next(new ExpressError('Campground not found',404));
+    // }
     //rendering show file  under campgrounds under views && we will pass that one found campground in show file
     res.render('campgrounds/show', { campground });
 }));
 
 //edit page for campgrounds 
-app.get('/campgrounds/:id/edit', CatchAsync(async (req, res) => {
+app.get('/campgrounds/:id/edit', CatchAsync(async (req, res, next) => {
     //now we will find campground which user asked in url 
     const campground = await Campground.findById(req.params.id);
     //rendering to edit page to edit a campground
@@ -100,7 +99,7 @@ app.get('/campgrounds/:id/edit', CatchAsync(async (req, res) => {
 }));
 
 //put request for updating specific campground
-app.put('/campgrounds/:id', CatchAsync(async (req, res) => {
+app.put('/campgrounds/:id', CatchAsync(async (req, res, next) => {
     //to check it worked
     // res.send("it worked");
 
@@ -113,7 +112,7 @@ app.put('/campgrounds/:id', CatchAsync(async (req, res) => {
 }));
 
 //deleting specific campground as simple as that
-app.delete('/campgrounds/:id', CatchAsync(async (req, res) => {
+app.delete('/campgrounds/:id', CatchAsync(async (req, res, next) => {
     const { id } = req.params;
     await Campground.findByIdAndDelete(id);
     res.redirect('/campgrounds');
@@ -129,11 +128,16 @@ app.delete('/campgrounds/:id', CatchAsync(async (req, res) => {
 // });
 // don't need this now☝️
 
+//for our custom error it will come here take input message and code than go to next route
+app.all('*', (req, res, next) => {
+    next(new ExpressError('Page not found', 404));
+})
+
 //a route for error handling whenever next(some parameter) is called it will come to this route;
 app.use((err, req, res, next) => {
-            //default status         //default message
-    const { status = 500, message = 'Something went wrong' } = err;
-    res.status(status).send(message);
+                        //default message         //default status
+    const { message = 'Something went wrong', statusCode = 500 } = err;
+    res.status(statusCode).send(message);
 });
 
 //setting port for all the pages
