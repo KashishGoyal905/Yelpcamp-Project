@@ -135,9 +135,11 @@ app.all('*', (req, res, next) => {
 
 //a route for error handling whenever next(some parameter) is called it will come to this route;
 app.use((err, req, res, next) => {
-                        //default message         //default status
-    const { message = 'Something went wrong', statusCode = 500 } = err;
-    res.status(statusCode).send(message);
+    //default message         //default status
+    const { statusCode = 500 } = err;
+    if (!err.message) err.message = 'Something Went Wrong!';
+    // renderinf error.ejs for error and passing message and code
+    res.status(statusCode).render('error', { err });
 });
 
 //setting port for all the pages
