@@ -17,6 +17,8 @@ const ExpressError = require('./Utils/ExpressError');
 const CatchAsync = require('./Utils/CatchAsync');
 //requiring joi for vaalidations
 const joi = require('joi');
+// requiring validatikon schema
+const campgroundSchema = require('./schemas.js')
 
 //connecting mongo man
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
@@ -44,6 +46,23 @@ app.use(methodOverride('_method'));
 //setting enfine for ejs-mate
 app.engine('ejs', ejsMate);
 
+
+
+const validateCampground = (req, res, next) => {
+    //using schema we made for validation and finding error part in this 
+    const { error } = campgroundSchema.validate(req.body);
+    //it will show the values we passed in if any error came it will show too
+    // console.log(result);
+    if (error) {
+        //if any error came we throw it using expresserror class
+        const msg = error.details.map(el => el.message).join(',')
+        throw new ExpressError(msg, 400);
+    }
+    else {
+        //need to call next to move to the next lines of code in route or specifically to catchasync portion
+        next();
+    }
+}
 //first home page
 app.get('/', (req, res) => {
     //rendering home.ejs
@@ -65,28 +84,11 @@ app.get('/campgrounds/new', (req, res) => {
 });
 
 //posting new added campground via post req
-app.post('/campgrounds', CatchAsync(async (req, res, next) => {
+//function for error handling
+app.post('/campgrounds', validateCampground, CatchAsync(async (req, res, next) => {
     //by default it will show us the empty body so we have to parse it
     // res.send(req.body);
-    //joi schema for validation
-    const campgroundSchema = joi.object({
-        campground:joi.object({
-            title:joi.string().required(),
-            price:joi.number().required().min(0),
-            image:joi.string().required(),
-            location:joi.string().required(),
-            description:joi.string().required()
-        }).required()
-    });
-    //using schema we made for validation and finding error part in this 
-        const {error} = campgroundSchema.validate(req.body);
-    //it will show the values we passed in if any error came it will show too
-    // console.log(result);
-    if(error){
-        //if any error came we throw it using expresserror class
-const msg = error.details.map(el => el.message).join(',')
-        throw new ExpressError(msg,400);
-    }
+
     //making new campground by user input
     const campground = new Campground(req.body.campground);
     //saving new campground to database
@@ -119,7 +121,7 @@ app.get('/campgrounds/:id/edit', CatchAsync(async (req, res, next) => {
 }));
 
 //put request for updating specific campground
-app.put('/campgrounds/:id', CatchAsync(async (req, res, next) => {
+app.put('/campgrounds/:id', validateCampground, CatchAsync(async (req, res, next) => {
     //to check it worked
     // res.send("it worked");
 
