@@ -17,8 +17,8 @@ const ExpressError = require('./Utils/ExpressError');
 const CatchAsync = require('./Utils/CatchAsync');
 //requiring joi for vaalidations
 const joi = require('joi');
-// requiring validatikon schema
-const campgroundSchema = require('./schemas.js');
+// requiring validatikon schema for campgrounds and reviews
+const {campgroundSchema,reviewSchema} = require('./schemas.js');
 // requiring revies model for making new reviews
 const Review = require('./models/review');
 
@@ -49,7 +49,7 @@ app.use(methodOverride('_method'));
 app.engine('ejs', ejsMate);
 
 
-
+// joi validation function for campgrounds so no one can invalidate using postman...
 const validateCampground = (req, res, next) => {
     //using schema we made for validation and finding error part in this 
     const { error } = campgroundSchema.validate(req.body);
@@ -65,6 +65,24 @@ const validateCampground = (req, res, next) => {
         next();
     }
 }
+
+// joi validation function for reviewa so no one can invalidate using postman...
+const validateReview = (req, res, next) => {
+    //using schema we made for validation and finding error part in this 
+    const { error } = reviewSchema.validate(req.body);
+    //it will show the values we passed in if any error came it will show too
+    // console.log(result);
+    if (error) {
+        //if any error came we throw it using expresserror class
+        const msg = error.details.map(el => el.message).join(',')
+        throw new ExpressError(msg, 400);
+    }
+    else {
+        //need to call next to move to the next lines of code in route or specifically to catchasync portion
+        next();
+    }
+}
+
 //first home page
 app.get('/', (req, res) => {
     //rendering home.ejs
@@ -143,7 +161,7 @@ app.delete('/campgrounds/:id', CatchAsync(async (req, res, next) => {
 }));
 
 //route for making reviews post req
-app.post('/campgrounds/:id/reviews', CatchAsync(async (req, res, next) => {
+app.post('/campgrounds/:id/reviews',validateReview, CatchAsync(async (req, res, next) => {
     // finding that specific campground in which we makin a review
     const campground = await Campground.findById(req.params.id);
     // making new review using schema
