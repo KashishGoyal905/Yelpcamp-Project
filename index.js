@@ -18,7 +18,9 @@ const CatchAsync = require('./Utils/CatchAsync');
 //requiring joi for vaalidations
 const joi = require('joi');
 // requiring validatikon schema
-const campgroundSchema = require('./schemas.js')
+const campgroundSchema = require('./schemas.js');
+// requiring revies model for making new reviews
+const Review = require('./models/review');
 
 //connecting mongo man
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
@@ -138,6 +140,22 @@ app.delete('/campgrounds/:id', CatchAsync(async (req, res, next) => {
     const { id } = req.params;
     await Campground.findByIdAndDelete(id);
     res.redirect('/campgrounds');
+}));
+
+//route for making reviews post req
+app.post('/campgrounds/:id/reviews', CatchAsync(async (req, res, next) => {
+    // finding that specific campground in which we makin a review
+    const campground = await Campground.findById(req.params.id);
+    // making new review using schema
+    const review = new Review(req.body.review);
+    // pushing to campground
+    campground.review.push(review);
+    // saving review
+    await review.save();
+    // saving review to campground
+    await campground.save();
+    // redirecting to specific campground
+    res.redirect('/campgrounds/${campground.id}');
 }));
 
 // just to make sure our database is connected👇

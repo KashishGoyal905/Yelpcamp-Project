@@ -10,7 +10,13 @@ const CampgroundSchema = new Schema({
     image: String,
     price: Number,
     description: String,
-    location: String
+    location: String,
+
+    // embedding or connecting revie model with camoground model
+    reviews:[{
+        type:Schema.Types.ObjectId,
+        ref:'Review'
+    }]
 });
 
 //exporting mongoose schema so that we can use this in index.js
