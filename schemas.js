@@ -3,6 +3,7 @@
 //requiring joi for vaalidations
 const joi = require('joi');
 
+//validations for campgroundschema using joi so no one can send nothing using postman or somethig else
 module.exports.campgroundSchema = joi.object({
     campground: joi.object({
         title: joi.string().required(),
@@ -10,5 +11,13 @@ module.exports.campgroundSchema = joi.object({
         image: joi.string().required(),
         location: joi.string().required(),
         description: joi.string().required()
+    }).required()
+});
+
+//validations for reviewschema using joi so no one can send nothing using postman or somethig else
+module.exports.reviewSchema = joi.object({
+    review: joi.object({
+        rating: joi.number().required().min(1).max(5),
+        body: joi.string().required()
     }).required()
 });
