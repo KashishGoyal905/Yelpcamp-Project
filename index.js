@@ -18,7 +18,7 @@ const CatchAsync = require('./Utils/CatchAsync');
 //requiring joi for vaalidations
 const joi = require('joi');
 // requiring validatikon schema for campgrounds and reviews
-const {campgroundSchema,reviewSchema} = require('./schemas.js');
+const { campgroundSchema, reviewSchema } = require('./schemas.js');
 // requiring revies model for making new reviews
 const Review = require('./models/review');
 
@@ -120,8 +120,8 @@ app.post('/campgrounds', validateCampground, CatchAsync(async (req, res, next) =
 
 //whenever someone try to come to this url it will show show.ejs file under campgrounds
 app.get('/campgrounds/:id', CatchAsync(async (req, res, next) => {
-    //now we will find campground which user asked in url 
-    const campground = await Campground.findById(req.params.id);
+    //now we will find campground which user asked in url       //parsing objectid 
+    const campground = await Campground.findById(req.params.id).populate('reviews');
     //demo for apperror we can do better by app.all()
     // if (!campground) {
     //     //a function/class ExpressError we pass in next();
@@ -161,19 +161,31 @@ app.delete('/campgrounds/:id', CatchAsync(async (req, res, next) => {
 }));
 
 //route for making reviews post req
-app.post('/campgrounds/:id/reviews',validateReview, CatchAsync(async (req, res, next) => {
+app.post('/campgrounds/:id/reviews', validateReview, CatchAsync(async (req, res, next) => {
     // finding that specific campground in which we makin a review
     const campground = await Campground.findById(req.params.id);
     // making new review using schema
     const review = new Review(req.body.review);
     // pushing to campground
-    campground.review.push(review);
+    campground.reviews.push(review);
     // saving review
     await review.save();
     // saving review to campground
     await campground.save();
     // redirecting to specific campground
-    res.redirect('/campgrounds/${campground.id}');
+    res.redirect(`/campgrounds/${campground._id}`);
+}));
+
+//review deleting route
+app.delete('/campgrounds/:id/reviews/:reviewId', CatchAsync(async(req, res) => {
+    // finding campground and review _id
+    const { id, reviewId } = req.params;
+    // updating campground review array of basicaly removing that specific single revie from array
+    await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
+    // removing from review
+    await Review.findByIdAndDelete(reviewId);
+    // redirecting
+    res.redirect(`/campgrounds/${id}`);
 }));
 
 // just to make sure our database is connected👇

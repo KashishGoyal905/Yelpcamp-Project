@@ -12,11 +12,24 @@ const CampgroundSchema = new Schema({
     description: String,
     location: String,
 
-    // embedding or connecting revie model with camoground model
-    reviews:[{
-        type:Schema.Types.ObjectId,
-        ref:'Review'
+    // embedding or connecting review model with camoground model
+    reviews: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Review'
     }]
+});
+
+//deleting review alongwith campground                 //campground we deleted passed here
+CampgroundSchema.post('findOneAndDelete', async function (doc) {
+    if (doc) {
+        // inside campground there is review named array
+        await Review.deleteMany({
+            // which has id
+            _id: {
+                $in: doc.reviews
+            }
+        })
+    }
 });
 
 //exporting mongoose schema so that we can use this in index.js
