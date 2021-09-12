@@ -15,7 +15,7 @@ const CampgroundSchema = new Schema({
     // embedding or connecting review model with camoground model
     reviews: [{
         type: Schema.Types.ObjectId,
-        ref: 'Review'
+        ref: 'Review' 
     }]
 });
 
