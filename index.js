@@ -7,32 +7,23 @@ const path = require('path');
 const methodOverride = require('method-override');
 //requiring mongoose
 const mongoose = require('mongoose');
-//requiring campground.js file here
-const Campground = require('./models/campground');
 //requiring ejs-mate for templates
 const ejsMate = require('ejs-mate');
 //requiring class/function Expresserror to throw our custom error 
 const ExpressError = require('./Utils/ExpressError');
-//requiring function catchasync under utils
-const CatchAsync = require('./Utils/CatchAsync');
-//requiring joi for vaalidations
-const joi = require('joi');
-// requiring validatikon schema for campgrounds and reviews
-const { campgroundSchema, reviewSchema } = require('./schemas.js');
-// requiring revies model for making new reviews
-const Review = require('./models/review');
 // requiring all campgrounds routes 
 const campgrounds = require('./Routes/campgrounds');
 // requiring all reviews routes 
 const reviews = require('./Routes/reviews');
-
-
+// requiring express-session
+const session = require('express-session');
 
 //connecting mongo man
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
     useNewUrlParser: true,
     useCreateIndex: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    useFindAndModify: false
 });
 
 //don't know why this is here kinda like connecting with mongo
@@ -54,8 +45,19 @@ app.use(methodOverride('_method'));
 //setting enfine for ejs-mate
 app.engine('ejs', ejsMate);
 
-
-
+// settion up secret and features
+const sessionConfig = {
+    secret: 'thisshouldbeabettersecret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+    }
+};
+// using session 
+app.use(session(sessionConfig));
 
 
 
@@ -65,13 +67,14 @@ app.use('/campgrounds', campgrounds);
 // route which use all reviews routes 
 // prefix for all reviews routes  //it'll use reviews file which we require at 27
 app.use('/campgrounds/:id/reviews', reviews);
+// serving static files
+app.use(express.static(path.join(__dirname, 'public')));
 
 //first home page
 app.get('/', (req, res) => {
     //rendering home.ejs
     res.render('home');
 });
-
 
 
 //for our custom error it will come here take input message and code than go to next route
