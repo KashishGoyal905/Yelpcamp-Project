@@ -6,6 +6,8 @@ const express = require('express');
 const router = express.Router({mergeParams:true}); //for req.params to work
 //requiring campground.js file here
 const Campground = require('../models/campground');
+// review models here
+const Review = require('../models/review');
 //requiring class/function Expresserror to throw our custom error 
 const ExpressError = require('../Utils/ExpressError');
 //requiring function catchasync under utils
@@ -43,6 +45,8 @@ router.post('/', validateReview, CatchAsync(async (req, res, next) => {
     await review.save();
     // saving review to campground
     await campground.save();
+    // review added message
+    req.flash('success', 'Created Review successfully');
     // redirecting to specific campground
     res.redirect(`/campgrounds/${campground._id}`);
 }));
@@ -55,6 +59,8 @@ router.delete('/:reviewId', CatchAsync(async (req, res) => {
     await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
     // removing from review
     await Review.findByIdAndDelete(reviewId);
+    // deleting review message
+    req.flash('success', 'Deleted Review successfully');
     // redirecting
     res.redirect(`/campgrounds/${id}`);
 }));

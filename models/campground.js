@@ -3,6 +3,7 @@
 //requiring mongoose
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const Review = require('./review')
 
 //making schema details for products
 const CampgroundSchema = new Schema({

@@ -61,6 +61,8 @@ router.post('/', validateCampground, CatchAsync(async (req, res, next) => {
     const campground = new Campground(req.body.campground);
     //saving new campground to database
     await campground.save();
+    // flashing a message 
+    req.flash('success', 'Suceesfully Created A Campground');
     //redirecting after save 
     res.redirect(`/campgrounds/${campground._id}`);
 }));
@@ -70,11 +72,11 @@ router.post('/', validateCampground, CatchAsync(async (req, res, next) => {
 router.get('/:id', CatchAsync(async (req, res, next) => {
     //now we will find campground which user asked in url       //parsing objectid 
     const campground = await Campground.findById(req.params.id).populate('reviews');
-    //demo for apperror we can do better by app.all()
-    // if (!campground) {
-    //     //a function/class ExpressError we pass in next();
-    //     return next(new ExpressError('Campground not found',404));
-    // }
+    // error flash message
+    if (!campground) {
+        req.flash('error', 'Campground Not Found');
+        return res.redirect('/campgrounds');
+    }
     //rendering show file  under campgrounds under views && we will pass that one found campground in show file
     res.render('campgrounds/show', { campground });
 }));
@@ -83,6 +85,11 @@ router.get('/:id', CatchAsync(async (req, res, next) => {
 router.get('/:id/edit', CatchAsync(async (req, res, next) => {
     //now we will find campground which user asked in url 
     const campground = await Campground.findById(req.params.id);
+    // error flash message
+    if (!campground) {
+        req.flash('error', 'Campground Not Found');
+        return res.redirect('/campgrounds');
+    }
     //rendering to edit page to edit a campground
     res.render('campgrounds/edit', { campground });
 
@@ -97,6 +104,8 @@ router.put('/:id', validateCampground, CatchAsync(async (req, res, next) => {
     const { id } = req.params;
     // finding by id and updating && spreading in object 
     const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
+    // updated flash message
+    req.flash('success',"Campground Updated Sucessfully");
     // redirecting to specific campground details page
     res.redirect(`/campgrounds/${campground._id}`);
 }));
@@ -105,6 +114,8 @@ router.put('/:id', validateCampground, CatchAsync(async (req, res, next) => {
 router.delete('/:id', CatchAsync(async (req, res, next) => {
     const { id } = req.params;
     await Campground.findByIdAndDelete(id);
+    // deleting review message
+    req.flash('success', 'Deleted Review successfully');
     res.redirect('/campgrounds');
 }));
 
