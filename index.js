@@ -17,6 +17,8 @@ const campgrounds = require('./Routes/campgrounds');
 const reviews = require('./Routes/reviews');
 // requiring express-session
 const session = require('express-session');
+// requiring flash
+const flash = require('connect-flash');
 
 //connecting mongo man
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
@@ -58,6 +60,15 @@ const sessionConfig = {
 };
 // using session 
 app.use(session(sessionConfig));
+// using flash session
+app.use(flash());
+
+// need to do it to send message via this middleware or via passing msg sucess to show route
+app.use((req, res, next) => {
+   res.locals.success = req.flash('success');
+   res.locals.error = req.flash('error');
+   next();
+});
 
 
 
