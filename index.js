@@ -11,14 +11,22 @@ const mongoose = require('mongoose');
 const ejsMate = require('ejs-mate');
 //requiring class/function Expresserror to throw our custom error 
 const ExpressError = require('./Utils/ExpressError');
+// requiring register routes 
+const userRoutes = require('./routes/users');
 // requiring all campgrounds routes 
-const campgrounds = require('./Routes/campgrounds');
+const campgroundRouteS = require('./Routes/campgrounds');
 // requiring all reviews routes 
-const reviews = require('./Routes/reviews');
+const reviewRoutes = require('./Routes/reviews');
 // requiring express-session
 const session = require('express-session');
 // requiring flash
 const flash = require('connect-flash');
+// rerquiring passport
+const passport = require('passport');
+// requiring passport-local
+const localStrategy = require('passport-local');
+// requiring user model schemas
+const User = require('./models/user');
 
 //connecting mongo man
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
@@ -62,22 +70,32 @@ const sessionConfig = {
 app.use(session(sessionConfig));
 // using flash session
 app.use(flash());
+// telling to use passport
+app.use(passport.initialize());
+// passport session
+app.use(passport.session());
+// using passport
+passport.use(new localStrategy(User.authenticate()));
 
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 // need to do it to send message via this middleware or via passing msg sucess to show route
 app.use((req, res, next) => {
-   res.locals.success = req.flash('success');
-   res.locals.error = req.flash('error');
-   next();
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    next();
 });
 
 
 
 // route which use all campgrounds routes 
 // prefix for all campground routes  //it'll use campgrounds file which we require at 25
-app.use('/campgrounds', campgrounds);
+app.use('/campgrounds', campgroundRoutes);
 // route which use all reviews routes 
 // prefix for all reviews routes  //it'll use reviews file which we require at 27
-app.use('/campgrounds/:id/reviews', reviews);
+app.use('/campgrounds/:id/reviews', reviewRoutes);
+// using userroutes file
+app.use('/', userRoutes);
 // serving static files
 app.use(express.static(path.join(__dirname, 'public')));
 
