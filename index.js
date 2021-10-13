@@ -14,7 +14,7 @@ const ExpressError = require('./Utils/ExpressError');
 // requiring register routes 
 const userRoutes = require('./routes/users');
 // requiring all campgrounds routes 
-const campgroundRouteS = require('./Routes/campgrounds');
+const campgroundRoutes = require('./Routes/campgrounds');
 // requiring all reviews routes 
 const reviewRoutes = require('./Routes/reviews');
 // requiring express-session
