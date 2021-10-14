@@ -12,7 +12,8 @@ const ExpressError = require('../Utils/ExpressError');
 const CatchAsync = require('../Utils/CatchAsync');
 // requiring validatikon schema for campgrounds and reviews
 const { campgroundSchema } = require('../schemas.js');
-
+// requiring middleware file for keep signed in users
+const { isLoggedIn } = require('../middleware');    
 
 
 // file for different types of similar routes 
@@ -46,14 +47,21 @@ router.get('/', CatchAsync(async (req, res, next) => {
 }));
 
 //new page for cretaing new campgrounds
-router.get('/new', (req, res) => {
+router.get('/new', isLoggedIn,(req, res) => {
+    // putting condtion to be logged in to submit any new campground
+    // if (!isAuthenticated()) {
+    //     // flash error
+    //     req.flash('error', 'you must be signed in');
+    //     // rediercting
+    //     return res.redirect('/login');
+    // }
     //rendering to new.ejs file
     res.render('campgrounds/new');
 });
 
 //posting new added campground via post req
 //function for error handling
-router.post('/', validateCampground, CatchAsync(async (req, res, next) => {
+router.post('/', isLoggedIn, validateCampground, CatchAsync(async (req, res, next) => {
     //by default it will show us the empty body so we have to parse it
     // res.send(req.body);
 
@@ -96,7 +104,7 @@ router.get('/:id/edit', CatchAsync(async (req, res, next) => {
 }));
 
 //put request for updating specific campground
-router.put('/:id', validateCampground, CatchAsync(async (req, res, next) => {
+router.put('/:id', isLoggedIn, validateCampground, CatchAsync(async (req, res, next) => {
     //to check it worked
     // res.send("it worked");
 
@@ -105,13 +113,13 @@ router.put('/:id', validateCampground, CatchAsync(async (req, res, next) => {
     // finding by id and updating && spreading in object 
     const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
     // updated flash message
-    req.flash('success',"Campground Updated Sucessfully");
+    req.flash('success', "Campground Updated Sucessfully");
     // redirecting to specific campground details page
     res.redirect(`/campgrounds/${campground._id}`);
 }));
 
 //deleting specific campground as simple as that
-router.delete('/:id', CatchAsync(async (req, res, next) => {
+router.delete('/:id', isLoggedIn, CatchAsync(async (req, res, next) => {
     const { id } = req.params;
     await Campground.findByIdAndDelete(id);
     // deleting review message
