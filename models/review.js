@@ -10,6 +10,10 @@ const Schema = mongoose.Schema;
 const reviewSchema = new Schema({
    body:String,
    rating:Number,
+   author:{
+      type:Schema.Types.ObjectId,
+      ref:'user'
+   }
 });
 
 //exporting reviews schema so that we can use this in index.js

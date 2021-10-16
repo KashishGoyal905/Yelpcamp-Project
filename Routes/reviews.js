@@ -6,6 +6,7 @@ const express = require('express');
 const router = express.Router({mergeParams:true}); //for req.params to work
 //requiring campground.js file here
 const Campground = require('../models/campground');
+const { validateReview, isLoggedIn, isReviewAuthor } = require('../middleware');
 // review models here
 const Review = require('../models/review');
 //requiring class/function Expresserror to throw our custom error 
@@ -17,24 +18,24 @@ const { reviewSchema } = require('../schemas.js');
 
 
 // joi validation function for reviewa so no one can invalidate using postman...
-const validateReview = (req, res, next) => {
-    //using schema we made for validation and finding error part in this 
-    const { error } = reviewSchema.validate(req.body);
-    //it will show the values we passed in if any error came it will show too
-    // console.log(result);
-    if (error) {
-        //if any error came we throw it using expresserror class
-        const msg = error.details.map(el => el.message).join(',')
-        throw new ExpressError(msg, 400);
-    }
-    else {
-        //need to call next to move to the next lines of code in route or specifically to catchasync portion
-        next();
-    }
-};
+// const validateReview = (req, res, next) => {
+//     //using schema we made for validation and finding error part in this 
+//     const { error } = reviewSchema.validate(req.body);
+//     //it will show the values we passed in if any error came it will show too
+//     // console.log(result);
+//     if (error) {
+//         //if any error came we throw it using expresserror class
+//         const msg = error.details.map(el => el.message).join(',')
+//         throw new ExpressError(msg, 400);
+//     }
+//     else {
+//         //need to call next to move to the next lines of code in route or specifically to catchasync portion
+//         next();
+//     }
+// };
 
 //route for making reviews post req
-router.post('/', validateReview, CatchAsync(async (req, res, next) => {
+router.post('/',isLoggedIn, validateReview, CatchAsync(async (req, res, next) => {
     // finding that specific campground in which we makin a review
     const campground = await Campground.findById(req.params.id);
     // making new review using schema
@@ -51,7 +52,7 @@ router.post('/', validateReview, CatchAsync(async (req, res, next) => {
     res.redirect(`/campgrounds/${campground._id}`);
 }));
 
-//review deleting route
+//review deleting route 
 router.delete('/:reviewId', CatchAsync(async (req, res) => {
     // finding campground and review _id
     const { id, reviewId } = req.params;

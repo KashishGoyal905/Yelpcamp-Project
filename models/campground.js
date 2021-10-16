@@ -12,7 +12,11 @@ const CampgroundSchema = new Schema({
     price: Number,
     description: String,
     location: String,
-
+    // author
+    author:{
+        type: Schema.Types.ObjectId,
+        ref: 'user' 
+    },
     // embedding or connecting review model with camoground model
     reviews: [{
         type: Schema.Types.ObjectId,
