@@ -13,29 +13,28 @@ const CatchAsync = require('../Utils/CatchAsync');
 // requiring validatikon schema for campgrounds and reviews
 const { campgroundSchema } = require('../schemas.js');
 // requiring middleware file for keep signed in users
-const { isLoggedIn } = require('../middleware');    
-
+const { isLoggedIn,isAuthor, validateCampground  } = require('../middleware');    
 
 // file for different types of similar routes 
 // all campground routes
 // instead of `app.` we have to use `router.`
 
 // joi validation function for campgrounds so no one can invalidate using postman...
-const validateCampground = (req, res, next) => {
-    //using schema we made for validation and finding error part in this 
-    const { error } = campgroundSchema.validate(req.body);
-    //it will show the values we passed in if any error came it will show too
-    // console.log(result);
-    if (error) {
-        //if any error came we throw it using expresserror class
-        const msg = error.details.map(el => el.message).join(',')
-        throw new ExpressError(msg, 400);
-    }
-    else {
-        //need to call next to move to the next lines of code in route or specifically to catchasync portion
-        next();
-    }
-}
+// const validateCampground = (req, res, next) => {
+//     //using schema we made for validation and finding error part in this 
+//     const { error } = campgroundSchema.validate(req.body);
+//     //it will show the values we passed in if any error came it will show too
+//     // console.log(result);
+//     if (error) {
+//         //if any error came we throw it using expresserror class
+//         const msg = error.details.map(el => el.message).join(',')
+//         throw new ExpressError(msg, 400);
+//     }
+//     else {
+//         //need to call next to move to the next lines of code in route or specifically to catchasync portion
+//         next();
+//     }
+// }
 
 
 //making page for campgrounds
@@ -67,6 +66,8 @@ router.post('/', isLoggedIn, validateCampground, CatchAsync(async (req, res, nex
 
     //making new campground by user input
     const campground = new Campground(req.body.campground);
+    // making author by username
+    campground.author=req.user._id;
     //saving new campground to database
     await campground.save();
     // flashing a message 
@@ -79,7 +80,8 @@ router.post('/', isLoggedIn, validateCampground, CatchAsync(async (req, res, nex
 //whenever someone try to come to this url it will show show.ejs file under campgrounds
 router.get('/:id', CatchAsync(async (req, res, next) => {
     //now we will find campground which user asked in url       //parsing objectid 
-    const campground = await Campground.findById(req.params.id).populate('reviews');
+    const campground = await Campground.findById(req.params.id).populate('reviews').populate('author');
+    console.log(campground);
     // error flash message
     if (!campground) {
         req.flash('error', 'Campground Not Found');
@@ -90,7 +92,7 @@ router.get('/:id', CatchAsync(async (req, res, next) => {
 }));
 
 //edit page for campgrounds 
-router.get('/:id/edit', CatchAsync(async (req, res, next) => {
+router.get('/:id/edit',isAuthor, CatchAsync(async (req, res, next) => {
     //now we will find campground which user asked in url 
     const campground = await Campground.findById(req.params.id);
     // error flash message
@@ -104,7 +106,7 @@ router.get('/:id/edit', CatchAsync(async (req, res, next) => {
 }));
 
 //put request for updating specific campground
-router.put('/:id', isLoggedIn, validateCampground, CatchAsync(async (req, res, next) => {
+router.put('/:id', isLoggedIn, isAuthor,validateCampground, CatchAsync(async (req, res, next) => {
     //to check it worked
     // res.send("it worked");
 
@@ -119,7 +121,7 @@ router.put('/:id', isLoggedIn, validateCampground, CatchAsync(async (req, res, n
 }));
 
 //deleting specific campground as simple as that
-router.delete('/:id', isLoggedIn, CatchAsync(async (req, res, next) => {
+router.delete('/:id', isLoggedIn,isAuthor, CatchAsync(async (req, res, next) => {
     const { id } = req.params;
     await Campground.findByIdAndDelete(id);
     // deleting review message
