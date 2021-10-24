@@ -15,6 +15,8 @@ const ExpressError = require('../Utils/ExpressError');
 const CatchAsync = require('../Utils/CatchAsync');
 // requiring validatikon schema for campgrounds and reviews
 const { reviewSchema } = require('../schemas.js');
+// requiring controller fuction review file
+const reviews = require('../controllers/reviews');
 
 
 // joi validation function for reviewa so no one can invalidate using postman...
@@ -35,36 +37,10 @@ const { reviewSchema } = require('../schemas.js');
 // };
 
 //route for making reviews post req
-router.post('/',isLoggedIn, validateReview, CatchAsync(async (req, res, next) => {
-    // finding that specific campground in which we makin a review
-    const campground = await Campground.findById(req.params.id);
-    // making new review using schema
-    const review = new Review(req.body.review);
-    // pushing to campground
-    campground.reviews.push(review);
-    // saving review
-    await review.save();
-    // saving review to campground
-    await campground.save();
-    // review added message
-    req.flash('success', 'Created Review successfully');
-    // redirecting to specific campground
-    res.redirect(`/campgrounds/${campground._id}`);
-}));
+router.post('/',isLoggedIn, validateReview, CatchAsync(reviews.createReview));
 
 //review deleting route 
-router.delete('/:reviewId', CatchAsync(async (req, res) => {
-    // finding campground and review _id
-    const { id, reviewId } = req.params;
-    // updating campground review array of basicaly removing that specific single revie from array
-    await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
-    // removing from review
-    await Review.findByIdAndDelete(reviewId);
-    // deleting review message
-    req.flash('success', 'Deleted Review successfully');
-    // redirecting
-    res.redirect(`/campgrounds/${id}`);
-}));
+router.delete('/:reviewId', CatchAsync(reviews.deleteReview));
 
 
 // exporting all routers
