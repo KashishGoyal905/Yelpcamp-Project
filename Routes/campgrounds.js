@@ -14,120 +14,36 @@ const CatchAsync = require('../Utils/CatchAsync');
 const { campgroundSchema } = require('../schemas.js');
 // requiring middleware file for keep signed in users
 const { isLoggedIn,isAuthor, validateCampground  } = require('../middleware');    
-
+// requiring campground controllers which have bunch of methods
+const campgrounds = require('../controllers/campgrounds');
 // file for different types of similar routes 
 // all campground routes
 // instead of `app.` we have to use `router.`
 
-// joi validation function for campgrounds so no one can invalidate using postman...
-// const validateCampground = (req, res, next) => {
-//     //using schema we made for validation and finding error part in this 
-//     const { error } = campgroundSchema.validate(req.body);
-//     //it will show the values we passed in if any error came it will show too
-//     // console.log(result);
-//     if (error) {
-//         //if any error came we throw it using expresserror class
-//         const msg = error.details.map(el => el.message).join(',')
-//         throw new ExpressError(msg, 400);
-//     }
-//     else {
-//         //need to call next to move to the next lines of code in route or specifically to catchasync portion
-//         next();
-//     }
-// }
 
 
 //making page for campgrounds
-router.get('/', CatchAsync(async (req, res, next) => {
-    //finding all campgrounds
-    const campgrounds = await Campground.find({});
-    //rendering index under campgrounds under views && passing all found campgound;
-    res.render('campgrounds/index', { campgrounds });
-}));
+router.get('/', CatchAsync(campgrounds.index));
 
 //new page for cretaing new campgrounds
-router.get('/new', isLoggedIn,(req, res) => {
-    // putting condtion to be logged in to submit any new campground
-    // if (!isAuthenticated()) {
-    //     // flash error
-    //     req.flash('error', 'you must be signed in');
-    //     // rediercting
-    //     return res.redirect('/login');
-    // }
-    //rendering to new.ejs file
-    res.render('campgrounds/new');
-});
+router.get('/new', isLoggedIn,campgrounds.renderNewForm);
 
 //posting new added campground via post req
 //function for error handling
-router.post('/', isLoggedIn, validateCampground, CatchAsync(async (req, res, next) => {
-    //by default it will show us the empty body so we have to parse it
-    // res.send(req.body);
-
-    //making new campground by user input
-    const campground = new Campground(req.body.campground);
-    // making author by username
-    campground.author=req.user._id;
-    //saving new campground to database
-    await campground.save();
-    // flashing a message 
-    req.flash('success', 'Suceesfully Created A Campground');
-    //redirecting after save 
-    res.redirect(`/campgrounds/${campground._id}`);
-}));
+router.post('/', isLoggedIn, validateCampground, CatchAsync(campgrounds.createCampgrounds));
 
 
 //whenever someone try to come to this url it will show show.ejs file under campgrounds
-router.get('/:id', CatchAsync(async (req, res, next) => {
-    //now we will find campground which user asked in url       //parsing objectid 
-    const campground = await Campground.findById(req.params.id).populate('reviews').populate('author');
-    console.log(campground);
-    // error flash message
-    if (!campground) {
-        req.flash('error', 'Campground Not Found');
-        return res.redirect('/campgrounds');
-    }
-    //rendering show file  under campgrounds under views && we will pass that one found campground in show file
-    res.render('campgrounds/show', { campground });
-}));
+router.get('/:id', CatchAsync(campgrounds.showCampground));
 
 //edit page for campgrounds 
-router.get('/:id/edit',isAuthor, CatchAsync(async (req, res, next) => {
-    //now we will find campground which user asked in url 
-    const campground = await Campground.findById(req.params.id);
-    // error flash message
-    if (!campground) {
-        req.flash('error', 'Campground Not Found');
-        return res.redirect('/campgrounds');
-    }
-    //rendering to edit page to edit a campground
-    res.render('campgrounds/edit', { campground });
-
-}));
+router.get('/:id/edit',isAuthor, CatchAsync(campgrounds.renderEditForm));
 
 //put request for updating specific campground
-router.put('/:id', isLoggedIn, isAuthor,validateCampground, CatchAsync(async (req, res, next) => {
-    //to check it worked
-    // res.send("it worked");
-
-    // finding id via url
-    const { id } = req.params;
-    // finding by id and updating && spreading in object 
-    const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
-    // updated flash message
-    req.flash('success', "Campground Updated Sucessfully");
-    // redirecting to specific campground details page
-    res.redirect(`/campgrounds/${campground._id}`);
-}));
+router.put('/:id', isLoggedIn, isAuthor,validateCampground, CatchAsync(campgrounds.updateCampground));
 
 //deleting specific campground as simple as that
-router.delete('/:id', isLoggedIn,isAuthor, CatchAsync(async (req, res, next) => {
-    const { id } = req.params;
-    await Campground.findByIdAndDelete(id);
-    // deleting review message
-    req.flash('success', 'Deleted Review successfully');
-    res.redirect('/campgrounds');
-}));
+router.delete('/:id', isLoggedIn,isAuthor, CatchAsync(campgrounds.delete));
 
 
 // exporting all routers
