@@ -11,18 +11,17 @@ const passport = require('passport');
 const users = require('../controllers/users');
 
 
+router.route('/register')
+    // simple get route form
+    .get(users.renderRegister)
+    // form route post req
+    .post( catchAsync(users.register));
 
-// simple get route form
-router.get('/register', users.renderRegister);
+router.route('/login')
+    .get( users.renderLogin)
+    .post( passport.authenticate('local', { failureFlash: true, failureRedirect: '/login' }), users.login);
 
-// form route post req
-router.post('/register', catchAsync(users.register));
-
-router.get('/login', users.renderLogin);
-
-router.post('/login', passport.authenticate('local', { failureFlash: true, failureRedirect: '/login' }), users.login);
-
-router.get('/logout',users.logout);
+router.get('/logout', users.logout);
 
 // exporting 
 module.exports = router;
